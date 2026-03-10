@@ -197,6 +197,22 @@ class DiscRenderer:
         self._grid_plane_cache: list[tuple[pygame.Surface, tuple[int, int]]] = []
         self._build_grid_plane_cache()
 
+    def _alpha_surface_for_points(
+        self, points: list[tuple[float, float]]
+    ) -> tuple[pygame.Surface, list[tuple[float, float]], tuple[int, int]]:
+        xs = [point[0] for point in points]
+        ys = [point[1] for point in points]
+        min_x = int(math.floor(min(xs)))
+        max_x = int(math.ceil(max(xs)))
+        min_y = int(math.floor(min(ys)))
+        max_y = int(math.ceil(max(ys)))
+        width = max(1, max_x - min_x + 2)
+        height = max(1, max_y - min_y + 2)
+
+        surface = pygame.Surface((width, height), pygame.SRCALPHA)
+        shifted = [(point[0] - min_x, point[1] - min_y) for point in points]
+        return surface, shifted, (min_x, min_y)
+
     def _screen_basis(self, world_point: Vec3) -> tuple[float, float]:
         x, y, z = world_point
         sx = self.center[0] + self.scale * (0.92 * x + 0.92 * y)
@@ -271,18 +287,9 @@ class DiscRenderer:
     def draw_polygon_alpha(self, points: list[tuple[float, float]], fill: tuple[int, int, int, int]) -> None:
         if not points:
             return
-        xs = [point[0] for point in points]
-        ys = [point[1] for point in points]
-        min_x = int(math.floor(min(xs)))
-        max_x = int(math.ceil(max(xs)))
-        min_y = int(math.floor(min(ys)))
-        max_y = int(math.ceil(max(ys)))
-        width = max(1, max_x - min_x + 2)
-        height = max(1, max_y - min_y + 2)
-        temp = pygame.Surface((width, height), pygame.SRCALPHA)
-        shifted = [(point[0] - min_x, point[1] - min_y) for point in points]
+        temp, shifted, offset = self._alpha_surface_for_points(points)
         pygame.draw.polygon(temp, fill, shifted)
-        self.surface.blit(temp, (min_x, min_y))
+        self.surface.blit(temp, offset)
 
     def draw_disc(self, orientation: Mat3) -> None:
         rim = [self.project(mat_vec(orientation, body_point)) for body_point in self.model.rim_points(120)]
@@ -309,18 +316,8 @@ class DiscRenderer:
         ]
         corners_screen = [self.project(point) for point in corners_world]
         polygon = [(x, y) for x, y, _ in corners_screen]
-
-        xs = [point[0] for point in polygon]
-        ys = [point[1] for point in polygon]
-        min_x = int(math.floor(min(xs)))
-        max_x = int(math.ceil(max(xs)))
-        min_y = int(math.floor(min(ys)))
-        max_y = int(math.ceil(max(ys)))
-        width = max(1, max_x - min_x + 2)
-        height = max(1, max_y - min_y + 2)
-
-        overlay = pygame.Surface((width, height), pygame.SRCALPHA)
-        shifted_polygon = [(point[0] - min_x, point[1] - min_y) for point in polygon]
+        overlay, shifted_polygon, offset = self._alpha_surface_for_points(polygon)
+        min_x, min_y = offset
         pygame.draw.polygon(overlay, (246, 247, 251, 180), shifted_polygon)
         pygame.draw.polygon(overlay, (222, 225, 233, 210), shifted_polygon, 1)
 
