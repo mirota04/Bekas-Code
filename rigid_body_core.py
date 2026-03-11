@@ -513,18 +513,21 @@ class BaseSimulationApp:
         )
         pygame.display.flip()
 
+    def _process_events(self) -> None:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYDOWN:
+                self._on_key_press(event.key)
+                if event.key == pygame.K_ESCAPE:
+                    self.running = False
+            elif event.type == pygame.KEYUP:
+                self._on_key_release(event.key)
+
     def run(self) -> None:
         try:
             while self.running:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self.running = False
-                    elif event.type == pygame.KEYDOWN:
-                        self._on_key_press(event.key)
-                        if event.key == pygame.K_ESCAPE:
-                            self.running = False
-                    elif event.type == pygame.KEYUP:
-                        self._on_key_release(event.key)
+                self._process_events()
 
                 if self.autoclose_seconds > 0.0 and time.perf_counter() - self.start_time >= self.autoclose_seconds:
                     self.running = False
