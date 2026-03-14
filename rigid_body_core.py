@@ -195,6 +195,7 @@ class DiscRenderer:
         self.small_font = pygame.font.SysFont("Helvetica", 20, bold=True)
         self.label_font = pygame.font.SysFont("Helvetica", 30, bold=True)
         self._grid_plane_cache: list[tuple[pygame.Surface, tuple[int, int]]] = []
+        self._text_cache: dict[tuple[int, str, str], pygame.Surface] = {}
         self._build_grid_plane_cache()
 
     def _alpha_surface_for_points(
@@ -276,7 +277,11 @@ class DiscRenderer:
         font: pygame.font.Font,
         center: bool = False,
     ) -> None:
-        image = font.render(text, True, pg_color(color))
+        cache_key = (id(font), color, text)
+        image = self._text_cache.get(cache_key)
+        if image is None:
+            image = font.render(text, True, pg_color(color))
+            self._text_cache[cache_key] = image
         rect = image.get_rect()
         if center:
             rect.center = (int(position[0]), int(position[1]))
