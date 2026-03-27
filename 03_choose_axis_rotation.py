@@ -2,7 +2,7 @@ from bootstrap_venv import ensure_local_python
 
 ensure_local_python()
 
-from rigid_body_core import BaseSimulationApp, mat_mul, orthonormalize, rotation_matrix
+from rigid_body_core import BaseSimulationApp, mat_identity, mat_mul, orthonormalize, rotation_matrix
 
 
 AXES = {
@@ -31,11 +31,7 @@ class ChosenAxisRotation(BaseSimulationApp):
         elif key == "space":
             self.paused = not self.paused
         elif key == "r":
-            self.orientation = (
-                (1.0, 0.0, 0.0),
-                (0.0, 1.0, 0.0),
-                (0.0, 0.0, 1.0),
-            )
+            self.orientation = mat_identity()
 
     def update(self, dt: float) -> None:
         if self.paused:

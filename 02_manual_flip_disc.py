@@ -4,7 +4,7 @@ from bootstrap_venv import ensure_local_python
 
 ensure_local_python()
 
-from rigid_body_core import BaseSimulationApp, mat_mul, orthonormalize, rotation_matrix
+from rigid_body_core import BaseSimulationApp, mat_identity, mat_mul, orthonormalize, rotation_matrix
 
 
 class ManualFlipSimulation(BaseSimulationApp):
@@ -14,11 +14,7 @@ class ManualFlipSimulation(BaseSimulationApp):
 
     def on_key_press(self, key: str) -> None:
         if key == "r":
-            self.orientation = (
-                (1.0, 0.0, 0.0),
-                (0.0, 1.0, 0.0),
-                (0.0, 0.0, 1.0),
-            )
+            self.orientation = mat_identity()
 
     def update(self, dt: float) -> None:
         angle = self.step_speed * dt
