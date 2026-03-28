@@ -10,6 +10,9 @@ AXES = {
     1: ((0.0, 1.0, 0.0), "y / intermediate inertia"),
     2: ((0.0, 0.0, 1.0), "z / largest inertia"),
 }
+AXIS_BY_KEY = {"1": 0, "2": 1, "3": 2}
+SPEED_STEP = 0.5
+MIN_SPEED = 0.5
 
 
 class ChosenAxisRotation(BaseSimulationApp):
@@ -21,13 +24,13 @@ class ChosenAxisRotation(BaseSimulationApp):
         self.highlight_axis = self.axis_index
 
     def on_key_press(self, key: str) -> None:
-        if key in {"1", "2", "3"}:
-            self.axis_index = int(key) - 1
+        if key in AXIS_BY_KEY:
+            self.axis_index = AXIS_BY_KEY[key]
             self.highlight_axis = self.axis_index
         elif key in {"plus", "equal"}:
-            self.speed += 0.5
+            self.speed += SPEED_STEP
         elif key in {"minus", "underscore"}:
-            self.speed = max(0.5, self.speed - 0.5)
+            self.speed = max(MIN_SPEED, self.speed - SPEED_STEP)
         elif key == "space":
             self.paused = not self.paused
         elif key == "r":
