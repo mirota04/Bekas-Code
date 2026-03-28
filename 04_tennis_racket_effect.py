@@ -4,20 +4,29 @@ ensure_local_python()
 
 from rigid_body_core import BaseSimulationApp, TorqueFreeBody
 
+MODE_X = "x"
+MODE_INTERMEDIATE = "tennis"
+MODE_Z = "z"
+MODE_BY_KEY = {
+    "1": MODE_X,
+    "2": MODE_INTERMEDIATE,
+    "3": MODE_Z,
+}
+
 
 class TennisRacketEffect(BaseSimulationApp):
     def __init__(self) -> None:
         super().__init__("Full Tennis Racket Effect")
         self.paused = False
         self.time_elapsed = 0.0
-        self.reset_mode("tennis")
+        self.reset_mode(MODE_INTERMEDIATE)
 
     def reset_mode(self, mode: str) -> None:
         moments = self.model.principal_moments
-        if mode == "x":
+        if mode == MODE_X:
             omega = (4.0, 0.08, 0.0)
             self.highlight_axis = 0
-        elif mode == "z":
+        elif mode == MODE_Z:
             omega = (0.0, 0.08, 3.2)
             self.highlight_axis = 2
         else:
@@ -32,13 +41,9 @@ class TennisRacketEffect(BaseSimulationApp):
         if key == "space":
             self.paused = not self.paused
         elif key == "r":
-            self.reset_mode("tennis")
-        elif key == "1":
-            self.reset_mode("x")
-        elif key == "2":
-            self.reset_mode("tennis")
-        elif key == "3":
-            self.reset_mode("z")
+            self.reset_mode(MODE_INTERMEDIATE)
+        elif key in MODE_BY_KEY:
+            self.reset_mode(MODE_BY_KEY[key])
 
     def update(self, dt: float) -> None:
         if self.paused:
