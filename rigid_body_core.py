@@ -202,13 +202,32 @@ class DiscRenderer:
         depth = 0.35 * world_point[0] - 0.35 * world_point[1] + 1.1 * world_point[2]
         return (x, y, depth)
 
+    def draw_line_alpha(
+        self,
+        start: tuple[float, float],
+        end: tuple[float, float],
+        color: tuple[int, int, int, int],
+        width: int,
+    ) -> None:
+        x1, y1 = start
+        x2, y2 = end
+        pad = width + 2
+        min_x = int(math.floor(min(x1, x2) - pad))
+        max_x = int(math.ceil(max(x1, x2) + pad))
+        min_y = int(math.floor(min(y1, y2) - pad))
+        max_y = int(math.ceil(max(y1, y2) + pad))
+        local_w = max(1, max_x - min_x + 1)
+        local_h = max(1, max_y - min_y + 1)
+
+        overlay = pygame.Surface((local_w, local_h), pygame.SRCALPHA)
+        pygame.draw.line(overlay, color, (x1 - min_x, y1 - min_y), (x2 - min_x, y2 - min_y), width)
+        self.surface.blit(overlay, (min_x, min_y))
+
     def draw_vector(self, start: Vec3, end: Vec3, color: str, width: int = 3, dash: tuple[int, int] | None = None) -> None:
         x1, y1, _ = self.project(start)
         x2, y2, _ = self.project(end)
-        overlay = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         if dash is None:
-            pygame.draw.line(overlay, with_alpha(color, 160), (x1, y1), (x2, y2), width)
-            self.surface.blit(overlay, (0, 0))
+            self.draw_line_alpha((x1, y1), (x2, y2), with_alpha(color, 160), width)
             return
 
         dash_on, dash_off = dash
@@ -223,9 +242,8 @@ class DiscRenderer:
             seg_end = min(distance + dash_on, total)
             start_pt = (x1 + dx * seg_start, y1 + dy * seg_start)
             end_pt = (x1 + dx * seg_end, y1 + dy * seg_end)
-            pygame.draw.line(overlay, with_alpha(color, 160), start_pt, end_pt, width)
+            self.draw_line_alpha(start_pt, end_pt, with_alpha(color, 160), width)
             distance += dash_on + dash_off
-        self.surface.blit(overlay, (0, 0))
 
     def draw_text(
         self,
