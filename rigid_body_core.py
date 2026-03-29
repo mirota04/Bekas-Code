@@ -190,6 +190,8 @@ class DiscRenderer:
         self.body_font = pygame.font.SysFont("Helvetica", 18)
         self.small_font = pygame.font.SysFont("Helvetica", 20, bold=True)
         self.label_font = pygame.font.SysFont("Helvetica", 30, bold=True)
+        self._grid_plane_cache: list[tuple[pygame.Surface, tuple[int, int]]] = []
+        self._build_grid_plane_cache()
 
     def _screen_basis(self, world_point: Vec3) -> tuple[float, float]:
         x, y, z = world_point
@@ -293,7 +295,7 @@ class DiscRenderer:
         highlight_pts = [(x, y) for x, y, _ in highlight]
         self.draw_polygon_alpha(highlight_pts, (255, 240, 179, 138))
 
-    def draw_plane_grid(self, basis_a: Vec3, basis_b: Vec3) -> None:
+    def build_plane_grid_surface(self, basis_a: Vec3, basis_b: Vec3) -> tuple[pygame.Surface, tuple[int, int]]:
         corners_world = [
             v_add(v_scale(basis_a, -self.plane_extent), v_scale(basis_b, -self.plane_extent)),
             v_add(v_scale(basis_a, self.plane_extent), v_scale(basis_b, -self.plane_extent)),
@@ -345,7 +347,12 @@ class DiscRenderer:
                 1,
             )
 
-        self.surface.blit(overlay, (min_x, min_y))
+        return overlay, (min_x, min_y)
+
+    def _build_grid_plane_cache(self) -> None:
+        self._grid_plane_cache.clear()
+        for basis_a, basis_b in WORLD_PLANES:
+            self._grid_plane_cache.append(self.build_plane_grid_surface(basis_a, basis_b))
 
     def draw_axis_label(self, text: str, point: Vec3, color: str) -> None:
         sx, sy, _ = self.project(point)
@@ -402,8 +409,8 @@ class DiscRenderer:
         show_overlay: bool = False,
     ) -> None:
         self.surface.fill(pg_color(BG))
-        for basis_a, basis_b in WORLD_PLANES:
-            self.draw_plane_grid(basis_a, basis_b)
+        for overlay, position in self._grid_plane_cache:
+            self.surface.blit(overlay, position)
 
         self.draw_disc(orientation)
         for point in self.model.heavy_points:
