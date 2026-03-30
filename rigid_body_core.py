@@ -148,6 +148,10 @@ class DiscModel:
     radius: float = 1.0
     heavy_mass: float = 3.0
     light_mass: float = 1.0
+    _unit_circle_cache: dict[int, list[Vec3]] | None = None
+
+    def __post_init__(self) -> None:
+        self._unit_circle_cache = {}
 
     @property
     def heavy_points(self) -> list[Vec3]:
@@ -168,11 +172,14 @@ class DiscModel:
         return (i_x, i_y, i_z)
 
     def rim_points(self, steps: int = 80) -> list[Vec3]:
-        pts = []
-        for idx in range(steps + 1):
-            angle = (2.0 * math.pi * idx) / steps
-            pts.append((self.radius * math.cos(angle), self.radius * math.sin(angle), 0.0))
-        return pts
+        cached = self._unit_circle_cache.get(steps)
+        if cached is None:
+            cached = []
+            for idx in range(steps + 1):
+                angle = (2.0 * math.pi * idx) / steps
+                cached.append((math.cos(angle), math.sin(angle), 0.0))
+            self._unit_circle_cache[steps] = cached
+        return [(self.radius * x, self.radius * y, z) for x, y, z in cached]
 
 
 class DiscRenderer:
