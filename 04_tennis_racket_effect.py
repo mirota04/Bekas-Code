@@ -19,6 +19,8 @@ class TennisRacketEffect(BaseSimulationApp):
         super().__init__("Full Tennis Racket Effect")
         self.paused = False
         self.time_elapsed = 0.0
+        self.substeps = 6
+        self.substeps_inv = 1.0 / self.substeps
         self.reset_mode(MODE_INTERMEDIATE)
 
     def reset_mode(self, mode: str) -> None:
@@ -49,9 +51,8 @@ class TennisRacketEffect(BaseSimulationApp):
         if self.paused:
             return
         self.time_elapsed += dt
-        substeps = 6
-        step = dt / substeps
-        for _ in range(substeps):
+        step = dt * self.substeps_inv
+        for _ in range(self.substeps):
             self.body.step(step)
         self.orientation = self.body.orientation
         self.angular_momentum_world = self.body.angular_momentum_world()

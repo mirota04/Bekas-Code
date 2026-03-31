@@ -19,6 +19,7 @@ class ChosenAxisRotation(BaseSimulationApp):
     def __init__(self) -> None:
         super().__init__("Chosen Axis Rotation")
         self.axis_index = 0
+        self.current_axis = AXES[self.axis_index][0]
         self.speed = 3.0
         self.paused = False
         self.highlight_axis = self.axis_index
@@ -26,6 +27,7 @@ class ChosenAxisRotation(BaseSimulationApp):
     def on_key_press(self, key: str) -> None:
         if key in AXIS_BY_KEY:
             self.axis_index = AXIS_BY_KEY[key]
+            self.current_axis = AXES[self.axis_index][0]
             self.highlight_axis = self.axis_index
         elif key in {"plus", "equal"}:
             self.speed += SPEED_STEP
@@ -39,8 +41,7 @@ class ChosenAxisRotation(BaseSimulationApp):
     def update(self, dt: float) -> None:
         if self.paused:
             return
-        axis, _ = AXES[self.axis_index]
-        self.orientation = orthonormalize(mat_mul(self.orientation, rotation_matrix(axis, self.speed * dt)))
+        self.orientation = orthonormalize(mat_mul(self.orientation, rotation_matrix(self.current_axis, self.speed * dt)))
 
     def status_lines(self) -> list[str]:
         _, label = AXES[self.axis_index]
