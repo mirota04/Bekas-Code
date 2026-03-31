@@ -6,14 +6,14 @@ ensure_local_python()
 
 from rigid_body_core import BaseSimulationApp, mat_identity, mat_mul, orthonormalize, rotation_matrix
 
-ROTATION_CONTROLS = [
+ROTATION_CONTROLS = (
     ("a", (1.0, 0.0, 0.0), 1.0, 0),
     ("d", (1.0, 0.0, 0.0), -1.0, 0),
     ("w", (0.0, 1.0, 0.0), 1.0, 1),
     ("s", (0.0, 1.0, 0.0), -1.0, 1),
     ("q", (0.0, 0.0, 1.0), 1.0, 2),
     ("e", (0.0, 0.0, 1.0), -1.0, 2),
-]
+)
 
 
 class ManualFlipSimulation(BaseSimulationApp):

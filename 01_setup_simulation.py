@@ -4,18 +4,18 @@ ensure_local_python()
 
 from rigid_body_core import BaseSimulationApp, mat_identity
 
+AXIS_BY_KEY = {"1": 0, "2": 1, "3": 2}
+
 
 class SetupSimulation(BaseSimulationApp):
     def __init__(self) -> None:
         super().__init__("Setup: Asymmetric Disc")
         self.orientation = mat_identity()
         self.highlight_axis = 1
-        self.mode = 1
 
     def on_key_press(self, key: str) -> None:
-        if key in {"1", "2", "3"}:
-            self.mode = int(key) - 1
-            self.highlight_axis = self.mode
+        if key in AXIS_BY_KEY:
+            self.highlight_axis = AXIS_BY_KEY[key]
 
     def status_lines(self) -> list[str]:
         i_x, i_y, i_z = self.model.principal_moments

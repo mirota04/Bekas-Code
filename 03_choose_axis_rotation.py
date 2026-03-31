@@ -13,6 +13,7 @@ AXES = {
 AXIS_BY_KEY = {"1": 0, "2": 1, "3": 2}
 SPEED_STEP = 0.5
 MIN_SPEED = 0.5
+DEFAULT_SPEED = 3.0
 
 
 class ChosenAxisRotation(BaseSimulationApp):
@@ -20,7 +21,8 @@ class ChosenAxisRotation(BaseSimulationApp):
         super().__init__("Chosen Axis Rotation")
         self.axis_index = 0
         self.current_axis = AXES[self.axis_index][0]
-        self.speed = 3.0
+        self.current_axis_label = AXES[self.axis_index][1]
+        self.speed = DEFAULT_SPEED
         self.paused = False
         self.highlight_axis = self.axis_index
 
@@ -28,6 +30,7 @@ class ChosenAxisRotation(BaseSimulationApp):
         if key in AXIS_BY_KEY:
             self.axis_index = AXIS_BY_KEY[key]
             self.current_axis = AXES[self.axis_index][0]
+            self.current_axis_label = AXES[self.axis_index][1]
             self.highlight_axis = self.axis_index
         elif key in {"plus", "equal"}:
             self.speed += SPEED_STEP
@@ -44,9 +47,8 @@ class ChosenAxisRotation(BaseSimulationApp):
         self.orientation = orthonormalize(mat_mul(self.orientation, rotation_matrix(self.current_axis, self.speed * dt)))
 
     def status_lines(self) -> list[str]:
-        _, label = AXES[self.axis_index]
         return [
-            f"Current axis: {label}",
+            f"Current axis: {self.current_axis_label}",
             f"Spin speed: {self.speed:.1f} rad/s",
             "1 / 2 / 3 chooses the axis. +/- changes speed. Space pauses. R resets.",
         ]

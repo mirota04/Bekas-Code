@@ -12,6 +12,11 @@ MODE_BY_KEY = {
     "2": MODE_INTERMEDIATE,
     "3": MODE_Z,
 }
+MODE_CONFIG = {
+    MODE_X: ((4.0, 0.08, 0.0), 0),
+    MODE_INTERMEDIATE: ((0.12, 4.6, 0.0), 1),
+    MODE_Z: ((0.0, 0.08, 3.2), 2),
+}
 
 
 class TennisRacketEffect(BaseSimulationApp):
@@ -25,15 +30,7 @@ class TennisRacketEffect(BaseSimulationApp):
 
     def reset_mode(self, mode: str) -> None:
         moments = self.model.principal_moments
-        if mode == MODE_X:
-            omega = (4.0, 0.08, 0.0)
-            self.highlight_axis = 0
-        elif mode == MODE_Z:
-            omega = (0.0, 0.08, 3.2)
-            self.highlight_axis = 2
-        else:
-            omega = (0.12, 4.6, 0.0)
-            self.highlight_axis = 1
+        omega, self.highlight_axis = MODE_CONFIG.get(mode, MODE_CONFIG[MODE_INTERMEDIATE])
         self.body = TorqueFreeBody(moments, omega)
         self.orientation = self.body.orientation
         self.angular_momentum_world = self.body.angular_momentum_world()

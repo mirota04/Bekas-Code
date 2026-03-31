@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import os
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 try:
     import pygame
@@ -148,10 +148,7 @@ class DiscModel:
     radius: float = 1.0
     heavy_mass: float = 3.0
     light_mass: float = 1.0
-    _unit_circle_cache: dict[int, list[Vec3]] | None = None
-
-    def __post_init__(self) -> None:
-        self._unit_circle_cache = {}
+    _unit_circle_cache: dict[int, list[Vec3]] = field(default_factory=dict, init=False, repr=False)
 
     @property
     def heavy_points(self) -> list[Vec3]:
@@ -235,8 +232,9 @@ class DiscRenderer:
     def draw_vector(self, start: Vec3, end: Vec3, color: str, width: int = 3, dash: tuple[int, int] | None = None) -> None:
         x1, y1, _ = self.project(start)
         x2, y2, _ = self.project(end)
+        color_rgba = with_alpha(color, 160)
         if dash is None:
-            self.draw_line_alpha((x1, y1), (x2, y2), with_alpha(color, 160), width)
+            self.draw_line_alpha((x1, y1), (x2, y2), color_rgba, width)
             return
 
         dash_on, dash_off = dash
@@ -251,7 +249,7 @@ class DiscRenderer:
             seg_end = min(distance + dash_on, total)
             start_pt = (x1 + dx * seg_start, y1 + dy * seg_start)
             end_pt = (x1 + dx * seg_end, y1 + dy * seg_end)
-            self.draw_line_alpha(start_pt, end_pt, with_alpha(color, 160), width)
+            self.draw_line_alpha(start_pt, end_pt, color_rgba, width)
             distance += dash_on + dash_off
 
     def draw_text(
