@@ -28,6 +28,20 @@ Z_COLOR = "#a878ef"
 L_COLOR = "#facc15"
 HIGHLIGHT = "#ffb11f"
 
+WORLD_X: Vec3 = (1.0, 0.0, 0.0)
+WORLD_Y: Vec3 = (0.0, 1.0, 0.0)
+WORLD_Z: Vec3 = (0.0, 0.0, 1.0)
+WORLD_PLANES: tuple[tuple[Vec3, Vec3], ...] = (
+    (WORLD_X, WORLD_Y),
+    (WORLD_X, WORLD_Z),
+    (WORLD_Y, WORLD_Z),
+)
+AXIS_DEFS: tuple[tuple[int, str, str, Vec3], ...] = (
+    (0, X_COLOR, "X", WORLD_X),
+    (1, Y_COLOR, "Y", WORLD_Y),
+    (2, Z_COLOR, "Z", WORLD_Z),
+)
+
 
 def pg_color(value: str) -> pygame.Color:
     return pygame.Color(value)
@@ -364,9 +378,8 @@ class DiscRenderer:
         show_overlay: bool = False,
     ) -> None:
         self.surface.fill(pg_color(BG))
-        self.draw_plane_grid((1.0, 0.0, 0.0), (0.0, 1.0, 0.0))
-        self.draw_plane_grid((1.0, 0.0, 0.0), (0.0, 0.0, 1.0))
-        self.draw_plane_grid((0.0, 1.0, 0.0), (0.0, 0.0, 1.0))
+        for basis_a, basis_b in WORLD_PLANES:
+            self.draw_plane_grid(basis_a, basis_b)
 
         self.draw_disc(orientation)
         for point in self.model.heavy_points:
@@ -374,12 +387,7 @@ class DiscRenderer:
         self.draw_light_marker(orientation, self.model.light_points[0], LIGHT_A)
         self.draw_light_marker(orientation, self.model.light_points[1], LIGHT_B)
 
-        axes = [
-            (0, X_COLOR, "X", (1.0, 0.0, 0.0)),
-            (1, Y_COLOR, "Y", (0.0, 1.0, 0.0)),
-            (2, Z_COLOR, "Z", (0.0, 0.0, 1.0)),
-        ]
-        for axis_index, color, label, axis_dir in axes:
+        for axis_index, color, label, axis_dir in AXIS_DEFS:
             color_to_use = HIGHLIGHT if highlight_axis == axis_index else color
             width = 3 if highlight_axis == axis_index else 2
             self.draw_vector(v_scale(axis_dir, -self.axis_extent), v_scale(axis_dir, self.axis_extent), color_to_use, width=width)
