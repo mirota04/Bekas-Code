@@ -41,6 +41,12 @@ AXIS_DEFS: tuple[tuple[int, str, str, Vec3], ...] = (
     (1, Y_COLOR, "Y", WORLD_Y),
     (2, Z_COLOR, "Z", WORLD_Z),
 )
+SPECIAL_KEYS: dict[str, str] = {
+    "=": "equal",
+    "+": "plus",
+    "-": "minus",
+    "_": "underscore",
+}
 
 
 def pg_color(value: str) -> pygame.Color:
@@ -439,14 +445,8 @@ class BaseSimulationApp:
         if key == pygame.K_SPACE:
             return "space"
         name = pygame.key.name(key).lower()
-        if name == "=":
-            return "equal"
-        if name == "+":
-            return "plus"
-        if name == "-":
-            return "minus"
-        if name == "_":
-            return "underscore"
+        if name in SPECIAL_KEYS:
+            return SPECIAL_KEYS[name]
         if 32 <= key <= 126:
             return chr(key).lower()
         return name
