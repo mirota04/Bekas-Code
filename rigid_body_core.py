@@ -20,12 +20,8 @@ Mat3 = tuple[Vec3, Vec3, Vec3]
 
 BG = "#ffffff"
 FG = "#334155"
-GRID = "#d7d9e2"
-HEAVY = "#d9d1cc"
 LIGHT_A = "#8ee7ef"
 LIGHT_B = "#8f82ff"
-DISC_FILL = "#ffd347"
-DISC_HIGHLIGHT = "#fff0b3"
 X_COLOR = "#ef6d9a"
 Y_COLOR = "#7b90ff"
 Z_COLOR = "#a878ef"
@@ -44,10 +40,6 @@ def with_alpha(value: str, alpha: int) -> tuple[int, int, int, int]:
 
 def v_add(a: Vec3, b: Vec3) -> Vec3:
     return (a[0] + b[0], a[1] + b[1], a[2] + b[2])
-
-
-def v_sub(a: Vec3, b: Vec3) -> Vec3:
-    return (a[0] - b[0], a[1] - b[1], a[2] - b[2])
 
 
 def v_scale(v: Vec3, s: float) -> Vec3:
@@ -129,20 +121,6 @@ def orthonormalize(m: Mat3) -> Mat3:
         (x[1], y[1], z[1]),
         (x[2], y[2], z[2]),
     )
-
-
-def axis_world(orientation: Mat3, axis_index: int) -> Vec3:
-    return (
-        orientation[0][axis_index],
-        orientation[1][axis_index],
-        orientation[2][axis_index],
-    )
-
-
-def default_view() -> Mat3:
-    tilt = rotation_matrix((1.0, 0.0, 0.0), -0.65)
-    turn = rotation_matrix((0.0, 0.0, 1.0), 0.55)
-    return mat_mul(tilt, turn)
 
 
 @dataclass
