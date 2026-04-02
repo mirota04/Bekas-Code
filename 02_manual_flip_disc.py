@@ -7,12 +7,12 @@ ensure_local_python()
 from rigid_body_core import BaseSimulationApp, mat_identity, mat_mul, orthonormalize, rotation_matrix
 
 ROTATION_CONTROLS = (
-    ("a", (1.0, 0.0, 0.0), 1.0, 0),
-    ("d", (1.0, 0.0, 0.0), -1.0, 0),
-    ("w", (0.0, 1.0, 0.0), 1.0, 1),
-    ("s", (0.0, 1.0, 0.0), -1.0, 1),
-    ("q", (0.0, 0.0, 1.0), 1.0, 2),
-    ("e", (0.0, 0.0, 1.0), -1.0, 2),
+    ("a", 0),
+    ("d", 0),
+    ("w", 1),
+    ("s", 1),
+    ("q", 2),
+    ("e", 2),
 )
 
 
@@ -27,9 +27,17 @@ class ManualFlipSimulation(BaseSimulationApp):
 
     def update(self, dt: float) -> None:
         angle = self.step_speed * dt
-        for key, axis, direction, highlight in ROTATION_CONTROLS:
+        rotation_by_key = {
+            "a": rotation_matrix((1.0, 0.0, 0.0), angle),
+            "d": rotation_matrix((1.0, 0.0, 0.0), -angle),
+            "w": rotation_matrix((0.0, 1.0, 0.0), angle),
+            "s": rotation_matrix((0.0, 1.0, 0.0), -angle),
+            "q": rotation_matrix((0.0, 0.0, 1.0), angle),
+            "e": rotation_matrix((0.0, 0.0, 1.0), -angle),
+        }
+        for key, highlight in ROTATION_CONTROLS:
             if key in self.pressed_keys:
-                self.orientation = orthonormalize(mat_mul(self.orientation, rotation_matrix(axis, direction * angle)))
+                self.orientation = orthonormalize(mat_mul(self.orientation, rotation_by_key[key]))
                 self.highlight_axis = highlight
                 break
 
